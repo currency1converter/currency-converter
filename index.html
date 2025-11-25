@@ -157,15 +157,33 @@ async function doConvert(){
   const amount=Number(amountEl.value)||0,from=fromEl.value,to=toEl.value;if(!from||!to)return;
   try{
     const url=`${API_BASE}/convert?from=${from}&to=${to}&amount=${amount}`;
-    const res=await fetch(url);
-    const data=await res.json();
-    const rate=data.info?data.info.rate:(data.result/amount);const converted=data.result;
-    resultEl.textContent=fmt(converted)+' '+to;
-    rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
-    lastUpdate.textContent=new Date().toLocaleString();
-    const fee=converted*(Number(feePercent.value)||0)/100; feeValue.textContent=fmt(fee)+' '+to;
-    loadHistoryChart(from,to);
-  }catch(e){console.error('convert error',e);}
+  try {
+    const url = `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.result) {
+        resultEl.textContent = "خطأ في التحويل";
+        rateTxt.textContent = "-";
+        return;
+    }
+
+    const converted = data.result;
+    const rate = data.info ? data.info.rate : converted / amount;
+
+    resultEl.textContent = fmt(converted) + ' ' + to;
+    rateTxt.textContent = `1 ${from} = ${fmt(rate)} ${to}`;
+    lastUpdate.textContent = new Date().toLocaleString();
+    const fee = converted * (Number(feePercent.value) || 0) / 100;
+    feeValue.textContent = fmt(fee) + ' ' + to;
+
+    loadHistoryChart(from, to);
+} catch(e) {
+    console.error('convert error', e);
+    resultEl.textContent = "خطأ في التحويل";
+    rateTxt.textContent = "-";
+}
+
 }
 
 async function loadHistoryChart(from,to){
