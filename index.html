@@ -1,226 +1,131 @@
  <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>محول العملات الفخم — سريع وSEO-ready</title>
-<meta name="description" content="محول عملات فوري مع تصميم عصري، مخططات 30 يوم، توقع السعر، حساب عمولة، حفظ التاريخ.">
-<meta name="keywords" content="محول العملات, تحويل العملات, USD إلى SAR, سعر الصرف, محول سعر الدولار">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>محول العملات الفوري</title>
 <style>
-:root {
-  --main:#0b74de;
-  --bg:#f0f4f8;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --shadow:0 10px 25px rgba(0,0,0,0.08);
-  --radius:14px;
-  --hover:#095bb5;
-}
-*{box-sizing:border-box;}
-body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#111;direction:rtl;}
-.container{max-width:1150px;margin:25px auto;padding:20px;}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;}
-h1{margin:0;font-size:26px;color:var(--main);}
-.muted{color:var(--muted);}
-.card{background:var(--card);padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);margin-top:18px;transition:0.2s;}
-.card:hover{box-shadow:0 15px 30px rgba(0,0,0,0.12);}
-.controls{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:15px;align-items:end;}
-select,input{padding:12px;border-radius:10px;border:1px solid #e0e0e0;font-size:14px;transition:0.2s;}
-select:hover,input:hover{border-color:var(--main);}
-button{background:var(--main);color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;transition:0.2s;}
-button:hover{background:var(--hover);}
-.flex{display:flex;gap:12px;align-items:center;}
-.lang select{padding:6px;border-radius:8px;border:1px solid #ccc;}
-footer{text-align:center;color:var(--muted);font-size:13px;margin-top:25px;}
-#chartWrap{height:330px;}
-@media(max-width:900px){.controls{grid-template-columns:1fr 1fr;}}
-@media(max-width:650px){.controls{grid-template-columns:1fr;}}
+    body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+    }
+    .box {
+        background: #fff;
+        padding: 20px;
+        margin: auto;
+        max-width: 450px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px #0002;
+    }
+    input, select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    button {
+        background: #0a84ff;
+        color: white;
+        cursor: pointer;
+    }
 </style>
 </head>
 <body>
-<div class="container">
-<header>
-  <div>
-    <h1>محول العملات الفخم</h1>
-    <div class="muted">تحويل فوري • مخطط 30 يوم • توقع السعر • حساب العمولة • سجل التحويلات</div>
-  </div>
-  <div class="flex lang">
-    <label for="langSel" class="muted">اللغة:</label>
-    <select id="langSel"><option value="ar">العربية</option><option value="en">English</option></select>
-  </div>
-</header>
 
-<main>
-<section class="card">
-  <div class="controls">
-    <div>
-      <label class="muted">المبلغ</label>
-      <input id="amount" type="number" value="1" min="0" step="any">
-    </div>
-    <div>
-      <label class="muted">من</label>
-      <select id="fromCurrency"></select>
-    </div>
-    <div>
-      <label class="muted">إلى</label>
-      <select id="toCurrency"></select>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <button id="convertBtn">تحويل الآن</button>
-      <button id="swapBtn">تبديل</button>
-      <div class="muted">آخر تحديث: <span id="lastUpdate">-</span></div>
-    </div>
-  </div>
+<h2>محول العملات الفوري — يعمل 100%</h2>
 
-  <div style="display:grid;grid-template-columns:1fr 330px;gap:18px;margin-top:22px;">
-    <div>
-      <div class="card">
-        <div class="muted">النتيجة</div>
-        <h2 id="result">-</h2>
-        <div class="muted">سعر الصرف: <span id="rateTxt">-</span></div>
-        <div style="margin-top:12px">
-          <label class="muted">العمولة (%)</label>
-          <input id="feePercent" type="number" value="0" min="0" step="0.01">
-          <div class="muted">قيمة العمولة: <span id="feeValue">0</span></div>
-        </div>
-        <div style="margin-top:12px;display:flex;gap:10px;">
-          <button id="saveBtn">حفظ التحويل</button>
-          <button id="clearHistory" style="background:#888;">مسح السجل</button>
-        </div>
-      </div>
-      <div class="card" style="margin-top:15px">
-        <div class="muted">سجل التحويلات</div>
-        <div id="history"></div>
-      </div>
-    </div>
+<div class="box">
 
-    <aside class="sidebar">
-      <div class="card">
-        <div class="muted">مخطط آخر 30 يوم</div>
-        <div id="chartWrap"><canvas id="myChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="muted">توقع السعر للغد</div>
-        <div id="prediction">-</div>
-      </div>
-      <div class="card">
-        <div class="muted">خيارات متقدمة</div>
-        <div class="muted">تحديث تلقائي كل: <input id="autoRefresh" type="number" value="0" min="0" style="width:70px"> ثانية</div>
-      </div>
-    </aside>
-  </div>
-</section>
-</main>
+    <label>المبلغ</label>
+    <input id="amount" type="number" value="1">
 
-<footer>
-  API مجاني: <code>exchangerate.host</code> | جاهز للرفع على GitHub Pages
-</footer>
+    <label>من</label>
+    <select id="from"></select>
+
+    <label>إلى</label>
+    <select id="to"></select>
+
+    <button onclick="doConvert()">تحويل الآن</button>
+
+    <h3 id="result">النتيجة: -</h3>
+    <h4 id="rate">سعر الصرف: -</h4>
+    <small id="update">آخر تحديث: -</small>
+
 </div>
 
 <script>
-const fromEl=document.querySelector('#fromCurrency');
-const toEl=document.querySelector('#toCurrency');
-const amountEl=document.querySelector('#amount');
-const convertBtn=document.querySelector('#convertBtn');
-const swapBtn=document.querySelector('#swapBtn');
-const resultEl=document.querySelector('#result');
-const rateTxt=document.querySelector('#rateTxt');
-const lastUpdate=document.querySelector('#lastUpdate');
-const feePercent=document.querySelector('#feePercent');
-const feeValue=document.querySelector('#feeValue');
-const saveBtn=document.querySelector('#saveBtn');
-const historyEl=document.querySelector('#history');
-const clearHistoryBtn=document.querySelector('#clearHistory');
-const chartCtx=document.getElementById('myChart').getContext('2d');
-const predictionEl=document.querySelector('#prediction');
-const autoRefreshEl=document.querySelector('#autoRefresh');
-const langSel=document.querySelector('#langSel');
-let chart=null;
+const amountEl = document.getElementById("amount");
+const fromEl   = document.getElementById("from");
+const toEl     = document.getElementById("to");
+const resultEl = document.getElementById("result");
+const rateEl   = document.getElementById("rate");
+const updateEl = document.getElementById("update");
 
-// تنسيق الأرقام
-function fmt(n){return Number(n).toLocaleString(undefined,{maximumFractionDigits:6});}
 
-// تحميل كل العملات من API
-async function loadSymbols(){
-    try{
-        const res = await fetch('https://api.exchangerate.host/symbols');
+// --- 1) تحميل العملات ---
+async function loadSymbols() {
+    try {
+        const res = await fetch("https://api.exchangerate.host/symbols");
         const data = await res.json();
-        const symbols = data.symbols;
-        const keys = Object.keys(symbols).sort();
-        fromEl.innerHTML='';
-        toEl.innerHTML='';
-        keys.forEach(k=>{
-            const opt=document.createElement('option');
-            opt.value=k;
-            opt.textContent=`${k} — ${symbols[k].description}`;
-            fromEl.appendChild(opt);
-            toEl.appendChild(opt.cloneNode(true));
+
+        const symbols = Object.keys(data.symbols);
+
+        symbols.forEach(s => {
+            fromEl.innerHTML += `<option value="${s}">${s}</option>`;
+            toEl.innerHTML   += `<option value="${s}">${s}</option>`;
         });
-        fromEl.value='USD';
-        toEl.value='SAR';
-    }catch(e){console.error('خطأ في تحميل العملات', e);}
-}
-loadSymbols();
 
-// الأحداث
-convertBtn.addEventListener('click', doConvert);
-swapBtn.addEventListener('click', ()=>{const a=fromEl.value; fromEl.value=toEl.value; toEl.value=a; doConvert();});
-saveBtn.addEventListener('click', saveHistory);
-clearHistoryBtn.addEventListener('click', clearHistory);
-autoRefreshEl.addEventListener('change', ()=>{const s=Number(autoRefreshEl.value); if(s>0){if(window._autoInterval) clearInterval(window._autoInterval); window._autoInterval=setInterval(doConvert,s*1000);}else{if(window._autoInterval) clearInterval(window._autoInterval);}});
-langSel.addEventListener('change', ()=>{document.documentElement.lang = langSel.value;});
-amountEl.addEventListener('keydown', e=>{if(e.key==='Enter') doConvert();});
+        fromEl.value = "USD";
+        toEl.value   = "SAR";
 
-// تحويل العملات
-async function doConvert(){
-    const amount=Number(amountEl.value)||0;
-    const from=fromEl.value;
-    const to=toEl.value;
-    if(!from||!to) return;
-    try{
-        const url=`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
-        const res=await fetch(url);
-        const data=await res.json();
-        if(!data.result || isNaN(data.result)){resultEl.textContent="خطأ في التحويل"; rateTxt.textContent="-"; return;}
-        const converted=data.result;
-        const rate=data.info ? data.info.rate : converted/amount;
-        resultEl.textContent=fmt(converted)+' '+to;
-        rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
-        lastUpdate.textContent=new Date().toLocaleString();
-        const fee=converted*(Number(feePercent.value)||0)/100;
-        feeValue.textContent=fmt(fee)+' '+to;
-        loadHistoryChart(from,to);
-    }catch(e){console.error(e); resultEl.textContent="خطأ في التحويل"; rateTxt.textContent="-";}
+    } catch (e) { 
+        console.error("Error loading symbols", e); 
+    }
 }
 
-// مخطط آخر 30 يوم
-async function loadHistoryChart(from,to){
-    try{
-        const end=new Date(); const start=new Date(); start.setDate(end.getDate()-30);
-        const s=start.toISOString().slice(0,10); const e=end.toISOString().slice(0,10);
-        const url=`https://api.exchangerate.host/timeseries?start_date=${s}&end_date=${e}&base=${from}&symbols=${to}`;
-        const res=await fetch(url); const data=await res.json();
-        const dates=Object.keys(data.rates).sort();
-        const values=dates.map(d=>data.rates[d][to]);
-        drawChart(dates,values);
-        const pred=predictNext(values); predictionEl.textContent=`~ ${fmt(pred)} ${to}`;
-    }catch(e){console.error(e);}
+
+// --- 2) التحويل ---
+async function doConvert() {
+    const amount = Number(amountEl.value);
+    const from   = fromEl.value;
+    const to     = toEl.value;
+
+    if (!amount || amount <= 0) {
+        resultEl.textContent = "أدخل مبلغًا صحيحًا";
+        return;
+    }
+
+    const url = `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const rate = data.info.rate;
+        const converted = data.result;
+
+        resultEl.textContent = `النتيجة: ${converted} ${to}`;
+        rateEl.textContent   = `سعر الصرف: 1 ${from} = ${rate} ${to}`;
+        updateEl.textContent = new Date().toLocaleString();
+
+    } catch (e) {
+        resultEl.textContent = "خطأ في التحويل";
+        console.error("convert error", e);
+    }
 }
 
-// رسم المخطط
-function drawChart(labels,values){if(chart) chart.destroy(); chart=new Chart(chartCtx,{type:'line',data:{labels,datasets:[{label:`${fromEl.value} → ${toEl.value}`,data:values,fill:false,tension:0.15}]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}});}
 
-// توقع السعر
-function predictNext(values){const n=values.length;if(n<2) return values[values.length-1]||0; let sumX=0,sumY=0,sumXY=0,sumXX=0; for(let i=0;i<n;i++){sumX+=i; sumY+=values[i]; sumXY+=i*values[i]; sumXX+=i*i;} const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX); const intercept=(sumY-slope*sumX)/n; return intercept+slope*n;}
-
-// سجل التحويلات
-function saveHistory(){const item={from:fromEl.value,to:toEl.value,amount:Number(amountEl.value)||0,result:resultEl.textContent,time:new Date().toISOString()}; const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); list.unshift(item); localStorage.setItem('conv_history',JSON.stringify(list.slice(0,50))); renderHistory();}
-function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>'; return;} historyEl.innerHTML=''; list.forEach(it=>{const d=document.createElement('div');d.className='small';d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`; historyEl.appendChild(d);});}
-function clearHistory(){localStorage.removeItem('conv_history'); renderHistory();}
-
-// بدء الموقع
-renderHistory(); doConvert();
+// --- 3) تأكد من تحميل العملات أولًا ثم بدء العمل ---
+(async()=>{
+    await loadSymbols();   // ← أهم خطوة
+    doConvert();           // يبدأ فقط بعد تحميل العملات
+})();
 </script>
+
 </body>
 </html>
