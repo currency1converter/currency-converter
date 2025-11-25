@@ -9,14 +9,7 @@
 <link rel="canonical" href="https://currency1converter.github.io/currency-converter/">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{
-  --main:#0b74de;
-  --bg:#f5f6fa;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --shadow:0 6px 20px rgba(0,0,0,0.08);
-  --radius:12px;
-}
+:root{--main:#0b74de;--bg:#f5f6fa;--card:#ffffff;--muted:#6b7280;--shadow:0 6px 20px rgba(0,0,0,0.08);--radius:12px;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:var(--bg);color:#111;direction:rtl;}
 .container{max-width:1100px;margin:20px auto;padding:20px;}
@@ -134,6 +127,7 @@ async function init(){
   loadFromHash();
   attachEvents();
 }
+
 async function loadSymbols(){
   try{
     const res=await fetch(API_BASE+'/symbols');
@@ -141,6 +135,7 @@ async function loadSymbols(){
     symbols=data.symbols;
   }catch(e){console.error('symbols error',e);}
 }
+
 function populateSelectors(){
   const keys=Object.keys(symbols).sort();
   for(const k of keys){
@@ -149,6 +144,7 @@ function populateSelectors(){
   }
   fromEl.value='USD'; toEl.value='SAR';
 }
+
 function attachEvents(){
   convertBtn.addEventListener('click', doConvert);
   swapBtn.addEventListener('click',()=>{const a=fromEl.value;fromEl.value=toEl.value;toEl.value=a;doConvert();updateHash();});
@@ -159,13 +155,16 @@ function attachEvents(){
   window.addEventListener('hashchange',loadFromHash);
   amountEl.addEventListener('keydown',e=>{if(e.key==='Enter')doConvert();});
 }
+
 function updateHash(){location.hash=`${fromEl.value}-${toEl.value}`;}
 function loadFromHash(){const h=location.hash.replace('#','');if(!h)return;const p=h.split('-');if(p.length===2){fromEl.value=p[0];toEl.value=p[1];}doConvert();}
+
 async function doConvert(){
   const amount=Number(amountEl.value)||0,from=fromEl.value,to=toEl.value;if(!from||!to)return;updateHash();
   try{
     const url=`${API_BASE}/convert?from=${from}&to=${to}&amount=${amount}`;
-    const res=await fetch(url);const data=await res.json();
+    const res=await fetch(url);
+    const data=await res.json();
     const rate=data.info?data.info.rate:(data.result/amount);const converted=data.result;
     resultEl.textContent=fmt(converted)+' '+to;
     rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
@@ -174,24 +173,29 @@ async function doConvert(){
     loadHistoryChart(from,to);
   }catch(e){console.error('convert error',e);}
 }
+
 async function loadHistoryChart(from,to){
   try{
     const end=new Date(); const start=new Date(); start.setDate(end.getDate()-30);
     const s=start.toISOString().slice(0,10); const e=end.toISOString().slice(0,10);
     const url=`${API_BASE}/timeseries?start_date=${s}&end_date=${e}&base=${from}&symbols=${to}`;
     const res=await fetch(url); const data=await res.json();
-    const dates=Object.keys(data.rates).sort(); const values=dates.map(d=>data.rates[d][to]);
-    drawChart(dates,values,from,to); predictionEl.textContent='~ '+fmt(predictNext(values))+' '+to;
+    const dates=Object.keys(data.rates).sort();
+    const values=dates.map(d=>data.rates[d][to]);
+    drawChart(dates,values,from,to);
+    const pred=predictNext(values); predictionEl.textContent=`~ ${fmt(pred)} ${to}`;
   }catch(e){console.error('history error',e);}
 }
-function drawChart(labels,values,from,to){if(chart)chart.destroy();chart=new Chart(chartCtx,{type:'line',data:{labels,datasets:[{label:`${from} → ${to}`,data:values,fill:false,tension:0.15}]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}});}
-function predictNext(values){const n=values.length;if(n<2)return values[n-1]||0;let sumX=0,sumY=0,sumXY=0,sumXX=0;for(let i=0;i<n;i++){sumX+=i;sumY+=values[i];sumXY+=i*values[i];sumXX+=i*i;}const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);const intercept=(sumY-slope*sumX)/n;return intercept+slope*n;}
+
+function drawChart(labels,values){if(chart)chart.destroy();chart=new Chart(chartCtx,{type:'line',data:{labels,datasets:[{label:`${fromEl.value} → ${toEl.value}`,data:values,fill:false,tension:0.15}]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}});}
+
+function predictNext(values){const n=values.length;if(n<2)return values[values.length-1]||0;let sumX=0,sumY=0,sumXY=0,sumXX=0;for(let i=0;i<n;i++){sumX+=i;sumY+=values[i];sumXY+=i*values[i];sumXX+=i*i;}const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);const intercept=(sumY-slope*sumX)/n;return intercept+slope*n;}
+
 function saveHistory(){const item={from:fromEl.value,to:toEl.value,amount:Number(amountEl.value)||0,result:resultEl.textContent,time:new Date().toISOString()};const list=JSON.parse(localStorage.getItem('conv_history')||'[]');list.unshift(item);localStorage.setItem('conv_history',JSON.stringify(list.slice(0,50)));renderHistory();}
 function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]');if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>';return;}historyEl.innerHTML='';list.forEach(it=>{const d=document.createElement('div');d.className='small';d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`;historyEl.appendChild(d);});}
 function clearHistory(){localStorage.removeItem('conv_history');renderHistory();}
 
-async function start(){await init(); renderHistory(); doConvert();}
-start();
+init().then(()=>{renderHistory();doConvert();});
 </script>
 </body>
 </html>
