@@ -1,254 +1,197 @@
-<!doctype html>
+ <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>محول العملات — سريع وSEO-ready</title>
-  <meta name="description" content="محول عملات سريع مع مخططات آخر 30 يوم، توقع السعر، حساب عمولة البنوك، وحفظ التاريخ. يدعم العربية والإنجليزية." />
-  <meta name="keywords" content="محول العملات, تحويل العملات, USD إلى SAR, سعر الصرف, محول سعر الدولار" />
-  <link rel="canonical" href="https://currency1converter.github.io/currency-converter/" />
-  <meta property="og:title" content="محول العملات — سريع وSEO-ready" />
-  <meta property="og:description" content="محول عملات سريع مع مخططات آخر 30 يوم، توقع السعر، حساب عمولة البنوك، وحفظ التاريخ." />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="ar_AR" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    :root{--main:#0b74de;--muted:#6b7280;--bg:#f7f7f8}
-    *{box-sizing:border-box}
-    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;direction:rtl;background:var(--bg);margin:0;color:#111}
-    .container{max-width:1100px;margin:18px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{margin:0;font-size:20px}
-    .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06);margin-top:12px}
-    .controls{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center}
-    select,input{padding:10px;border-radius:8px;border:1px solid #e6e6e9}
-    button{background:var(--main);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
-    .row{display:flex;gap:10px;align-items:center}
-    .muted{color:var(--muted);font-size:14px}
-    #chartWrap{height:320px}
-    .small{font-size:13px}
-    .sidebar{display:grid;gap:10px}
-    .flex{display:flex;gap:10px;align-items:center}
-    .lang{background:#fff;padding:6px;border-radius:8px}
-    footer{margin-top:18px;color:var(--muted);font-size:13px}
-    @media (max-width:880px){.controls{grid-template-columns:1fr;}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محول العملات الفوري — فخم وSEO-ready</title>
+<meta name="description" content="محول عملات فوري مع مخططات آخر 30 يوم، توقع السعر، حساب عمولة البنوك، وحفظ التاريخ. يدعم العربية والإنجليزية.">
+<meta name="keywords" content="محول العملات, تحويل العملات, USD إلى SAR, سعر الصرف, محول سعر الدولار">
+<link rel="canonical" href="https://currency1converter.github.io/currency-converter/">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --main:#0b74de;
+  --bg:#f5f6fa;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --shadow:0 6px 20px rgba(0,0,0,0.08);
+  --radius:12px;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:var(--bg);color:#111;direction:rtl;}
+.container{max-width:1100px;margin:20px auto;padding:20px;}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+h1{margin:0;font-size:24px;color:var(--main);}
+.muted{color:var(--muted);}
+.card{background:var(--card);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-top:15px;}
+.controls{display:grid;grid-template-columns:1fr 1fr auto;gap:15px;align-items:end;}
+select,input{padding:12px;border-radius:8px;border:1px solid #e6e6e9;font-size:14px;}
+button{background:var(--main);color:#fff;border:0;padding:12px 18px;border-radius:8px;font-weight:600;cursor:pointer;transition:0.2s;}
+button:hover{opacity:0.9;}
+.sidebar{display:grid;gap:15px;}
+.flex{display:flex;gap:10px;align-items:center;}
+.lang select{padding:6px;border-radius:8px;border:1px solid #ccc;}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:20px;}
+#chartWrap{height:320px;}
+@media(max-width:900px){.controls{grid-template-columns:1fr;}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1>محول العملات — سريع وSEO-ready</h1>
-        <div class="muted">مخطط 30 يوم • توقع السعر • حساب عمولة البنوك • حفظ التاريخ</div>
-      </div>
-      <div class="flex">
-        <div class="lang">
-          <label for="langSel" class="small">اللغة</label>
-          <select id="langSel"><option value="ar">العربية</option><option value="en">English</option></select>
-        </div>
-      </div>
-    </header>
+<div class="container">
+<header>
+  <div>
+    <h1>محول العملات الفوري</h1>
+    <div class="muted">مخطط 30 يوم • توقع السعر • حساب عمولة • حفظ التاريخ</div>
+  </div>
+  <div class="flex lang">
+    <label for="langSel" class="muted">اللغة:</label>
+    <select id="langSel"><option value="ar">العربية</option><option value="en">English</option></select>
+  </div>
+</header>
 
-    <main>
-      <section class="card">
-        <div class="controls">
-          <div>
-            <label class="small">المبلغ</label>
-            <input id="amount" type="number" value="1" min="0" step="any">
-          </div>
-
-          <div>
-            <label class="small">من</label>
-            <select id="fromCurrency"></select>
-          </div>
-
-          <div>
-            <label class="small">إلى</label>
-            <select id="toCurrency"></select>
-          </div>
-
-          <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;margin-top:8px">
-            <button id="convertBtn">تحويل الآن</button>
-            <button id="swapBtn" class="small">تبديل</button>
-            <div class="muted small">آخر تحديث: <span id="lastUpdate">-</span></div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 300px;gap:12px">
-          <div>
-            <div class="card" id="resultCard">
-              <div class="muted">النتيجة</div>
-              <h2 id="result">-</h2>
-              <div class="muted small">سعر الصرف: <span id="rateTxt">-</span></div>
-              <div style="margin-top:8px">
-                <label class="small">حساب العمولة (%)</label>
-                <input id="feePercent" type="number" value="0" min="0" step="0.01">
-                <div class="muted small">قيمة العمولة: <span id="feeValue">0</span></div>
-              </div>
-
-              <div style="margin-top:10px">
-                <button id="saveBtn" class="small">حفظ التحويل</button>
-                <button id="clearHistory" class="small secondary">مسح السجل</button>
-              </div>
-            </div>
-
-            <div class="card" style="margin-top:12px">
-              <div class="muted">سجل التحويلات</div>
-              <div id="history"></div>
-            </div>
-          </div>
-
-          <aside class="sidebar">
-            <div class="card">
-              <div class="muted">مخطط آخر 30 يوم</div>
-              <div id="chartWrap"><canvas id="myChart"></canvas></div>
-            </div>
-
-            <div class="card">
-              <div class="muted">توقع السعر للغد (نموذجي)</div>
-              <div id="prediction">-</div>
-            </div>
-
-            <div class="card">
-              <div class="muted">خيارات متقدمة</div>
-              <div class="small muted">تحديث تلقائي كل: <input id="autoRefresh" type="number" value="0" min="0" style="width:70px"> ثواني</div>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:12px">
-        <div class="muted">SEO & صفحات لكل تحويل</div>
-        <div class="small muted">عند رفع المشروع على GitHub، أنشئ صفحات ثابتة لكل زوج عملات 
-          (<code>/usd-to-sar</code>) لتستهدف كلمات البحث مباشرةً — سأزوّد سكربت توليد الصفحات لاحقًا.</div>
-      </section>
-
-      <footer class="muted card">
-        نصيحة: استخدم API مجانية: <code>exchangerate.host</code>، صالح للاستخدام بدون API key. الموقع جاهز للرفع على GitHub Pages.
-      </footer>
-    </main>
+<main>
+<section class="card">
+  <div class="controls">
+    <div>
+      <label class="muted">المبلغ</label>
+      <input id="amount" type="number" value="1" min="0" step="any">
+    </div>
+    <div>
+      <label class="muted">من</label>
+      <select id="fromCurrency"></select>
+    </div>
+    <div>
+      <label class="muted">إلى</label>
+      <select id="toCurrency"></select>
+    </div>
+    <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;margin-top:10px;">
+      <button id="convertBtn">تحويل الآن</button>
+      <button id="swapBtn">تبديل</button>
+      <div class="muted">آخر تحديث: <span id="lastUpdate">-</span></div>
+    </div>
   </div>
 
-  <script>
-    const API_BASE = 'https://api.exchangerate.host';
-    function q(sel){return document.querySelector(sel)}
-    function fmt(n){return Number(n).toLocaleString(undefined,{maximumFractionDigits:6})}
-    const fromEl = q('#fromCurrency'); const toEl = q('#toCurrency'); const amountEl = q('#amount');
-    const convertBtn = q('#convertBtn'); const swapBtn = q('#swapBtn'); const resultEl = q('#result');
-    const rateTxt = q('#rateTxt'); const lastUpdate = q('#lastUpdate'); const feePercent = q('#feePercent');
-    const feeValue = q('#feeValue'); const saveBtn = q('#saveBtn'); const historyEl = q('#history');
-    const clearHistoryBtn = q('#clearHistory'); const chartCtx = document.getElementById('myChart').getContext('2d');
-    const predictionEl = q('#prediction'); const autoRefreshEl = q('#autoRefresh'); const langSel = q('#langSel');
-    let chart=null; let symbols={};
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:15px;margin-top:20px;">
+    <div>
+      <div class="card">
+        <div class="muted">النتيجة</div>
+        <h2 id="result">-</h2>
+        <div class="muted">سعر الصرف: <span id="rateTxt">-</span></div>
+        <div style="margin-top:10px">
+          <label class="muted">العمولة (%)</label>
+          <input id="feePercent" type="number" value="0" min="0" step="0.01">
+          <div class="muted">قيمة العمولة: <span id="feeValue">0</span></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;">
+          <button id="saveBtn">حفظ التحويل</button>
+          <button id="clearHistory" style="background:#888;">مسح السجل</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:15px">
+        <div class="muted">سجل التحويلات</div>
+        <div id="history"></div>
+      </div>
+    </div>
 
-    async function init(){
-      await loadSymbols();
-      populateSelectors();
-      loadFromHash();
-      attachEvents();
-    }
+    <aside class="sidebar">
+      <div class="card">
+        <div class="muted">مخطط آخر 30 يوم</div>
+        <div id="chartWrap"><canvas id="myChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="muted">توقع السعر للغد</div>
+        <div id="prediction">-</div>
+      </div>
+      <div class="card">
+        <div class="muted">خيارات متقدمة</div>
+        <div class="muted">تحديث تلقائي كل: <input id="autoRefresh" type="number" value="0" min="0" style="width:70px"> ثانية</div>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
 
-    async function loadSymbols(){
-      try{
-        const res=await fetch(API_BASE+'/symbols');
-        const data=await res.json();
-        symbols=data.symbols;
-      }catch(e){console.error('symbols error',e)}
-    }
+<footer>
+  API مجاني: <code>exchangerate.host</code> | جاهز للرفع على GitHub Pages
+</footer>
+</div>
 
-    function populateSelectors(){
-      const keys=Object.keys(symbols).sort();
-      for(const k of keys){
-        const opt1=document.createElement('option'); opt1.value=k; opt1.textContent=k+' — '+symbols[k].description;
-        const opt2=opt1.cloneNode(true);
-        fromEl.appendChild(opt1); toEl.appendChild(opt2);
-      }
-      fromEl.value='USD'; toEl.value='SAR';
-    }
+<script>
+const API_BASE='https://api.exchangerate.host';
+function q(s){return document.querySelector(s);}
+function fmt(n){return Number(n).toLocaleString(undefined,{maximumFractionDigits:6});}
+const fromEl=q('#fromCurrency'),toEl=q('#toCurrency'),amountEl=q('#amount'),
+convertBtn=q('#convertBtn'),swapBtn=q('#swapBtn'),resultEl=q('#result'),rateTxt=q('#rateTxt'),
+lastUpdate=q('#lastUpdate'),feePercent=q('#feePercent'),feeValue=q('#feeValue'),
+saveBtn=q('#saveBtn'),historyEl=q('#history'),clearHistoryBtn=q('#clearHistory'),
+chartCtx=document.getElementById('myChart').getContext('2d'),
+predictionEl=q('#prediction'),autoRefreshEl=q('#autoRefresh'),langSel=q('#langSel');
+let chart=null,symbols={};
 
-    function attachEvents(){
-      convertBtn.addEventListener('click', doConvert);
-      swapBtn.addEventListener('click', ()=>{const a=fromEl.value; fromEl.value=toEl.value; toEl.value=a; doConvert(); updateHash();});
-      saveBtn.addEventListener('click', saveHistory);
-      clearHistoryBtn.addEventListener('click', clearHistory);
-      autoRefreshEl.addEventListener('change', ()=>{const s=Number(autoRefreshEl.value); if(s>0){if(window._autoInterval) clearInterval(window._autoInterval); window._autoInterval=setInterval(doConvert,s*1000);}else{if(window._autoInterval) clearInterval(window._autoInterval);}});
-      langSel.addEventListener('change', ()=>{ if(langSel.value==='en') document.documentElement.lang='en'; else document.documentElement.lang='ar'; });
-      window.addEventListener('hashchange', loadFromHash);
-      amountEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doConvert(); });
-    }
+async function init(){
+  await loadSymbols();
+  populateSelectors();
+  loadFromHash();
+  attachEvents();
+}
+async function loadSymbols(){
+  try{
+    const res=await fetch(API_BASE+'/symbols');
+    const data=await res.json();
+    symbols=data.symbols;
+  }catch(e){console.error('symbols error',e);}
+}
+function populateSelectors(){
+  const keys=Object.keys(symbols).sort();
+  for(const k of keys){
+    const opt=document.createElement('option'); opt.value=k; opt.textContent=k+' — '+symbols[k].description;
+    fromEl.appendChild(opt); toEl.appendChild(opt.cloneNode(true));
+  }
+  fromEl.value='USD'; toEl.value='SAR';
+}
+function attachEvents(){
+  convertBtn.addEventListener('click', doConvert);
+  swapBtn.addEventListener('click',()=>{const a=fromEl.value;fromEl.value=toEl.value;toEl.value=a;doConvert();updateHash();});
+  saveBtn.addEventListener('click',saveHistory);
+  clearHistoryBtn.addEventListener('click',clearHistory);
+  autoRefreshEl.addEventListener('change',()=>{const s=Number(autoRefreshEl.value);if(s>0){if(window._autoInterval) clearInterval(window._autoInterval);window._autoInterval=setInterval(doConvert,s*1000);}else{if(window._autoInterval) clearInterval(window._autoInterval);}});
+  langSel.addEventListener('change',()=>{document.documentElement.lang=langSel.value;});
+  window.addEventListener('hashchange',loadFromHash);
+  amountEl.addEventListener('keydown',e=>{if(e.key==='Enter')doConvert();});
+}
+function updateHash(){location.hash=`${fromEl.value}-${toEl.value}`;}
+function loadFromHash(){const h=location.hash.replace('#','');if(!h)return;const p=h.split('-');if(p.length===2){fromEl.value=p[0];toEl.value=p[1];}doConvert();}
+async function doConvert(){
+  const amount=Number(amountEl.value)||0,from=fromEl.value,to=toEl.value;if(!from||!to)return;updateHash();
+  try{
+    const url=`${API_BASE}/convert?from=${from}&to=${to}&amount=${amount}`;
+    const res=await fetch(url);const data=await res.json();
+    const rate=data.info?data.info.rate:(data.result/amount);const converted=data.result;
+    resultEl.textContent=fmt(converted)+' '+to;
+    rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
+    lastUpdate.textContent=new Date().toLocaleString();
+    const fee=converted*(Number(feePercent.value)||0)/100; feeValue.textContent=fmt(fee)+' '+to;
+    loadHistoryChart(from,to);
+  }catch(e){console.error('convert error',e);}
+}
+async function loadHistoryChart(from,to){
+  try{
+    const end=new Date(); const start=new Date(); start.setDate(end.getDate()-30);
+    const s=start.toISOString().slice(0,10); const e=end.toISOString().slice(0,10);
+    const url=`${API_BASE}/timeseries?start_date=${s}&end_date=${e}&base=${from}&symbols=${to}`;
+    const res=await fetch(url); const data=await res.json();
+    const dates=Object.keys(data.rates).sort(); const values=dates.map(d=>data.rates[d][to]);
+    drawChart(dates,values,from,to); predictionEl.textContent='~ '+fmt(predictNext(values))+' '+to;
+  }catch(e){console.error('history error',e);}
+}
+function drawChart(labels,values,from,to){if(chart)chart.destroy();chart=new Chart(chartCtx,{type:'line',data:{labels,datasets:[{label:`${from} → ${to}`,data:values,fill:false,tension:0.15}]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}});}
+function predictNext(values){const n=values.length;if(n<2)return values[n-1]||0;let sumX=0,sumY=0,sumXY=0,sumXX=0;for(let i=0;i<n;i++){sumX+=i;sumY+=values[i];sumXY+=i*values[i];sumXX+=i*i;}const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);const intercept=(sumY-slope*sumX)/n;return intercept+slope*n;}
+function saveHistory(){const item={from:fromEl.value,to:toEl.value,amount:Number(amountEl.value)||0,result:resultEl.textContent,time:new Date().toISOString()};const list=JSON.parse(localStorage.getItem('conv_history')||'[]');list.unshift(item);localStorage.setItem('conv_history',JSON.stringify(list.slice(0,50)));renderHistory();}
+function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]');if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>';return;}historyEl.innerHTML='';list.forEach(it=>{const d=document.createElement('div');d.className='small';d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`;historyEl.appendChild(d);});}
+function clearHistory(){localStorage.removeItem('conv_history');renderHistory();}
 
-    function updateHash(){ location.hash=`${fromEl.value}-${toEl.value}`; }
-    function loadFromHash(){ const h=location.hash.replace('#',''); if(!h) return; const parts=h.split('-'); if(parts.length===2){fromEl.value=parts[0]; toEl.value=parts[1];} doConvert();}
-
-    async function doConvert(){
-      const amount=Number(amountEl.value)||0; const from=fromEl.value; const to=toEl.value;
-      if(!from||!to) return;
-      updateHash();
-      try{
-        const url=`${API_BASE}/convert?from=${from}&to=${to}&amount=${amount}`;
-        const res=await fetch(url);
-        const data=await res.json();
-        const rate=data.info?data.info.rate:(data.result/amount);
-        const converted=data.result;
-        resultEl.textContent=fmt(converted)+' '+to;
-        rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
-        lastUpdate.textContent=new Date().toLocaleString();
-        const feeP=Number(feePercent.value)||0; const fee=converted*(feeP/100); feeValue.textContent=fmt(fee)+' '+to;
-        loadHistoryChart(from,to);
-      }catch(e){console.error('convert error',e);}
-    }
-
-    async function loadHistoryChart(from,to){
-      try{
-        const end=new Date(); const start=new Date(); start.setDate(end.getDate()-30);
-        const s=start.toISOString().slice(0,10); const e=end.toISOString().slice(0,10);
-        const url=`${API_BASE}/timeseries?start_date=${s}&end_date=${e}&base=${from}&symbols=${to}`;
-        const res=await fetch(url); const data=await res.json();
-        const dates=Object.keys(data.rates).sort();
-        const values=dates.map(d=>data.rates[d][to]);
-        drawChart(dates,values,from,to);
-        const pred=predictNext(values);
-        predictionEl.textContent=`~ ${fmt(pred)} ${to}`;
-      }catch(e){console.error('history error',e);}
-    }
-
-    function drawChart(labels,values,from,to){
-      if(chart) chart.destroy();
-      chart=new Chart(chartCtx,{
-        type:'line',
-        data:{labels,datasets:[{label:`${from} → ${to}`, data:values, fill:false, tension:0.15}]},
-        options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}
-      });
-    }
-
-    function predictNext(values){
-      const n=values.length; if(n<2) return values[values.length-1]||0;
-      let sumX=0,sumY=0,sumXY=0,sumXX=0;
-      for(let i=0;i<n;i++){sumX+=i; sumY+=values[i]; sumXY+=i*values[i]; sumXX+=i*i;}
-      const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);
-      const intercept=(sumY-slope*sumX)/n;
-      const nextX=n;
-      return intercept+slope*nextX;
-    }
-
-    function saveHistory(){
-      const from=fromEl.value, to=toEl.value, amount=Number(amountEl.value)||0, resultTxt=resultEl.textContent;
-      const item={from,to,amount,result:resultTxt,time:new Date().toISOString()};
-      const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); list.unshift(item); localStorage.setItem('conv_history',JSON.stringify(list.slice(0,50))); renderHistory();
-    }
-
-    function renderHistory(){
-      const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); 
-      if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>'; return;}
-      historyEl.innerHTML=''; for(const it of list){ const d=document.createElement('div'); d.className='small'; d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class='muted'>${new Date(it.time).toLocaleString()}</span></div>`; historyEl.appendChild(d);}
-    }
-
-    function clearHistory(){ localStorage.removeItem('conv_history'); renderHistory(); }
-
-    init().then(()=>{ renderHistory(); doConvert(); });
-  </script>
+async function start(){await init(); renderHistory(); doConvert();}
+start();
+</script>
 </body>
 </html>
