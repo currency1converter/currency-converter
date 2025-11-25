@@ -122,17 +122,20 @@
 
   <script>
     // مساعدة في تفسير الحقول: إما أرقام مفصولة بفواصل أو مجموع واحد
-    function parseNumbersField(str){
-      if(!str) return [];
-      // if contains comma or spaces, parse list
-      if(str.indexOf(',')!==-1 || /\s/.test(str)){
-        return str.split(/[,
-\s]+/).map(s=>parseFloat(s)).filter(n=>!isNaN(n));
-      }
-      // else single number
-      var v = parseFloat(str.replace(/[^0-9.]/g,''));
-      return isNaN(v)?[]:[v];
-    }
+   function parseNumbersField(str){
+  if(!str) return [];
+
+  if(str.indexOf(',') !== -1 || /\s/.test(str)){
+    return str
+      .split(/[, \n\r\t]+/)
+      .map(function(s){ return parseFloat(s); })
+      .filter(function(n){ return !isNaN(n); });
+  }
+
+  var v = parseFloat(str.replace(/[^0-9.]/g,''));
+  return isNaN(v) ? [] : [v];
+}
+
 
     function sum(arr){return arr.reduce((a,b)=>a+(+b||0),0)}
 
