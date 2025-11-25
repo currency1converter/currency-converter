@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
@@ -51,11 +51,33 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:20px;}
     </div>
     <div>
       <label class="muted">من</label>
-      <select id="fromCurrency"></select>
+      <select id="fromCurrency">
+        <option value="USD">USD — الدولار الأمريكي</option>
+        <option value="EUR">EUR — اليورو</option>
+        <option value="SAR">SAR — الريال السعودي</option>
+        <option value="GBP">GBP — الجنيه الإسترليني</option>
+        <option value="JPY">JPY — الين الياباني</option>
+        <option value="AED">AED — الدرهم الإماراتي</option>
+        <option value="KWD">KWD — الدينار الكويتي</option>
+        <option value="EGP">EGP — الجنيه المصري</option>
+        <option value="TRY">TRY — الليرة التركية</option>
+        <!-- أضف باقي العملات هنا حسب الحاجة -->
+      </select>
     </div>
     <div>
       <label class="muted">إلى</label>
-      <select id="toCurrency"></select>
+      <select id="toCurrency">
+        <option value="USD">USD — الدولار الأمريكي</option>
+        <option value="EUR">EUR — اليورو</option>
+        <option value="SAR">SAR — الريال السعودي</option>
+        <option value="GBP">GBP — الجنيه الإسترليني</option>
+        <option value="JPY">JPY — الين الياباني</option>
+        <option value="AED">AED — الدرهم الإماراتي</option>
+        <option value="KWD">KWD — الدينار الكويتي</option>
+        <option value="EGP">EGP — الجنيه المصري</option>
+        <option value="TRY">TRY — الليرة التركية</option>
+        <!-- أضف باقي العملات هنا حسب الحاجة -->
+      </select>
     </div>
     <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;margin-top:10px;">
       <button id="convertBtn">تحويل الآن</button>
@@ -119,48 +141,20 @@ lastUpdate=q('#lastUpdate'),feePercent=q('#feePercent'),feeValue=q('#feeValue'),
 saveBtn=q('#saveBtn'),historyEl=q('#history'),clearHistoryBtn=q('#clearHistory'),
 chartCtx=document.getElementById('myChart').getContext('2d'),
 predictionEl=q('#prediction'),autoRefreshEl=q('#autoRefresh'),langSel=q('#langSel');
-let chart=null,symbols={};
-
-async function init(){
-  await loadSymbols();
-  populateSelectors();
-  loadFromHash();
-  attachEvents();
-}
-
-async function loadSymbols(){
-  try{
-    const res=await fetch(API_BASE+'/symbols');
-    const data=await res.json();
-    symbols=data.symbols;
-  }catch(e){console.error('symbols error',e);}
-}
-
-function populateSelectors(){
-  const keys=Object.keys(symbols).sort();
-  for(const k of keys){
-    const opt=document.createElement('option'); opt.value=k; opt.textContent=k+' — '+symbols[k].description;
-    fromEl.appendChild(opt); toEl.appendChild(opt.cloneNode(true));
-  }
-  fromEl.value='USD'; toEl.value='SAR';
-}
+let chart=null;
 
 function attachEvents(){
   convertBtn.addEventListener('click', doConvert);
-  swapBtn.addEventListener('click',()=>{const a=fromEl.value;fromEl.value=toEl.value;toEl.value=a;doConvert();updateHash();});
+  swapBtn.addEventListener('click',()=>{const a=fromEl.value;fromEl.value=toEl.value;toEl.value=a;doConvert();});
   saveBtn.addEventListener('click',saveHistory);
   clearHistoryBtn.addEventListener('click',clearHistory);
   autoRefreshEl.addEventListener('change',()=>{const s=Number(autoRefreshEl.value);if(s>0){if(window._autoInterval) clearInterval(window._autoInterval);window._autoInterval=setInterval(doConvert,s*1000);}else{if(window._autoInterval) clearInterval(window._autoInterval);}});
   langSel.addEventListener('change',()=>{document.documentElement.lang=langSel.value;});
-  window.addEventListener('hashchange',loadFromHash);
   amountEl.addEventListener('keydown',e=>{if(e.key==='Enter')doConvert();});
 }
 
-function updateHash(){location.hash=`${fromEl.value}-${toEl.value}`;}
-function loadFromHash(){const h=location.hash.replace('#','');if(!h)return;const p=h.split('-');if(p.length===2){fromEl.value=p[0];toEl.value=p[1];}doConvert();}
-
 async function doConvert(){
-  const amount=Number(amountEl.value)||0,from=fromEl.value,to=toEl.value;if(!from||!to)return;updateHash();
+  const amount=Number(amountEl.value)||0,from=fromEl.value,to=toEl.value;if(!from||!to)return;
   try{
     const url=`${API_BASE}/convert?from=${from}&to=${to}&amount=${amount}`;
     const res=await fetch(url);
@@ -182,7 +176,7 @@ async function loadHistoryChart(from,to){
     const res=await fetch(url); const data=await res.json();
     const dates=Object.keys(data.rates).sort();
     const values=dates.map(d=>data.rates[d][to]);
-    drawChart(dates,values,from,to);
+    drawChart(dates,values);
     const pred=predictNext(values); predictionEl.textContent=`~ ${fmt(pred)} ${to}`;
   }catch(e){console.error('history error',e);}
 }
@@ -195,7 +189,9 @@ function saveHistory(){const item={from:fromEl.value,to:toEl.value,amount:Number
 function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]');if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>';return;}historyEl.innerHTML='';list.forEach(it=>{const d=document.createElement('div');d.className='small';d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`;historyEl.appendChild(d);});}
 function clearHistory(){localStorage.removeItem('conv_history');renderHistory();}
 
-init().then(()=>{renderHistory();doConvert();});
+attachEvents();
+renderHistory();
+doConvert();
 </script>
 </body>
 </html>
