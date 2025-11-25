@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
@@ -60,23 +60,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:25px;}
     </div>
     <div>
       <label class="muted">من</label>
-      <select id="fromCurrency">
-        <option value="USD">USD — الدولار الأمريكي</option>
-        <option value="EUR">EUR — اليورو</option>
-        <option value="SAR">SAR — الريال السعودي</option>
-        <option value="GBP">GBP — الجنيه الإسترليني</option>
-        <option value="JPY">JPY — الين الياباني</option>
-      </select>
+      <select id="fromCurrency"></select>
     </div>
     <div>
       <label class="muted">إلى</label>
-      <select id="toCurrency">
-        <option value="USD">USD — الدولار الأمريكي</option>
-        <option value="EUR">EUR — اليورو</option>
-        <option value="SAR">SAR — الريال السعودي</option>
-        <option value="GBP">GBP — الجنيه الإسترليني</option>
-        <option value="JPY">JPY — الين الياباني</option>
-      </select>
+      <select id="toCurrency"></select>
     </div>
     <div style="display:flex;gap:10px;align-items:center;">
       <button id="convertBtn">تحويل الآن</button>
@@ -150,8 +138,32 @@ const autoRefreshEl=document.querySelector('#autoRefresh');
 const langSel=document.querySelector('#langSel');
 let chart=null;
 
+// تنسيق الأرقام
 function fmt(n){return Number(n).toLocaleString(undefined,{maximumFractionDigits:6});}
 
+// تحميل كل العملات من API
+async function loadSymbols(){
+    try{
+        const res = await fetch('https://api.exchangerate.host/symbols');
+        const data = await res.json();
+        const symbols = data.symbols;
+        const keys = Object.keys(symbols).sort();
+        fromEl.innerHTML='';
+        toEl.innerHTML='';
+        keys.forEach(k=>{
+            const opt=document.createElement('option');
+            opt.value=k;
+            opt.textContent=`${k} — ${symbols[k].description}`;
+            fromEl.appendChild(opt);
+            toEl.appendChild(opt.cloneNode(true));
+        });
+        fromEl.value='USD';
+        toEl.value='SAR';
+    }catch(e){console.error('خطأ في تحميل العملات', e);}
+}
+loadSymbols();
+
+// الأحداث
 convertBtn.addEventListener('click', doConvert);
 swapBtn.addEventListener('click', ()=>{const a=fromEl.value; fromEl.value=toEl.value; toEl.value=a; doConvert();});
 saveBtn.addEventListener('click', saveHistory);
@@ -160,28 +172,29 @@ autoRefreshEl.addEventListener('change', ()=>{const s=Number(autoRefreshEl.value
 langSel.addEventListener('change', ()=>{document.documentElement.lang = langSel.value;});
 amountEl.addEventListener('keydown', e=>{if(e.key==='Enter') doConvert();});
 
+// تحويل العملات
 async function doConvert(){
     const amount=Number(amountEl.value)||0;
     const from=fromEl.value;
     const to=toEl.value;
     if(!from||!to) return;
-
     try{
         const url=`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
         const res=await fetch(url);
         const data=await res.json();
-        if(!data.result){resultEl.textContent="خطأ في التحويل"; rateTxt.textContent="-"; return;}
-
+        if(!data.result || isNaN(data.result)){resultEl.textContent="خطأ في التحويل"; rateTxt.textContent="-"; return;}
         const converted=data.result;
         const rate=data.info ? data.info.rate : converted/amount;
         resultEl.textContent=fmt(converted)+' '+to;
         rateTxt.textContent=`1 ${from} = ${fmt(rate)} ${to}`;
         lastUpdate.textContent=new Date().toLocaleString();
-        const fee=converted*(Number(feePercent.value)||0)/100; feeValue.textContent=fmt(fee)+' '+to;
+        const fee=converted*(Number(feePercent.value)||0)/100;
+        feeValue.textContent=fmt(fee)+' '+to;
         loadHistoryChart(from,to);
     }catch(e){console.error(e); resultEl.textContent="خطأ في التحويل"; rateTxt.textContent="-";}
 }
 
+// مخطط آخر 30 يوم
 async function loadHistoryChart(from,to){
     try{
         const end=new Date(); const start=new Date(); start.setDate(end.getDate()-30);
@@ -195,14 +208,18 @@ async function loadHistoryChart(from,to){
     }catch(e){console.error(e);}
 }
 
+// رسم المخطط
 function drawChart(labels,values){if(chart) chart.destroy(); chart=new Chart(chartCtx,{type:'line',data:{labels,datasets:[{label:`${fromEl.value} → ${toEl.value}`,data:values,fill:false,tension:0.15}]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{x:{display:true},y:{display:true}}}});}
 
+// توقع السعر
 function predictNext(values){const n=values.length;if(n<2) return values[values.length-1]||0; let sumX=0,sumY=0,sumXY=0,sumXX=0; for(let i=0;i<n;i++){sumX+=i; sumY+=values[i]; sumXY+=i*values[i]; sumXX+=i*i;} const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX); const intercept=(sumY-slope*sumX)/n; return intercept+slope*n;}
 
+// سجل التحويلات
 function saveHistory(){const item={from:fromEl.value,to:toEl.value,amount:Number(amountEl.value)||0,result:resultEl.textContent,time:new Date().toISOString()}; const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); list.unshift(item); localStorage.setItem('conv_history',JSON.stringify(list.slice(0,50))); renderHistory();}
-function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>'; return;} historyEl.innerHTML=''; list.forEach(it=>{const d=document.createElement('div'); d.className='small'; d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`; historyEl.appendChild(d);});}
+function renderHistory(){const list=JSON.parse(localStorage.getItem('conv_history')||'[]'); if(!list.length){historyEl.innerHTML='<div class="muted small">لا توجد سجلات</div>'; return;} historyEl.innerHTML=''; list.forEach(it=>{const d=document.createElement('div');d.className='small';d.innerHTML=`<div>${it.amount} ${it.from} → ${it.result} <span class="muted">${new Date(it.time).toLocaleString()}</span></div>`; historyEl.appendChild(d);});}
 function clearHistory(){localStorage.removeItem('conv_history'); renderHistory();}
 
+// بدء الموقع
 renderHistory(); doConvert();
 </script>
 </body>
