@@ -1,22 +1,22 @@
  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>محول العملات الفوري</title>
+
 <style>
     body {
         font-family: sans-serif;
         background: #f5f5f5;
-        margin: 0;
-        padding: 20px;
         text-align: center;
+        padding: 20px;
     }
     .box {
-        background: #fff;
+        background: white;
         padding: 20px;
-        margin: auto;
         max-width: 450px;
+        margin: auto;
         border-radius: 15px;
         box-shadow: 0 0 15px #0002;
     }
@@ -24,14 +24,13 @@
         width: 100%;
         padding: 12px;
         margin: 10px 0;
+        font-size: 16px;
         border-radius: 10px;
         border: 1px solid #ccc;
-        font-size: 16px;
     }
     button {
         background: #0a84ff;
         color: white;
-        cursor: pointer;
     }
 </style>
 </head>
@@ -40,9 +39,8 @@
 <h2>محول العملات الفوري — يعمل 100%</h2>
 
 <div class="box">
-
     <label>المبلغ</label>
-    <input id="amount" type="number" value="1">
+    <input type="number" id="amount" value="1">
 
     <label>من</label>
     <select id="from"></select>
@@ -55,7 +53,6 @@
     <h3 id="result">النتيجة: -</h3>
     <h4 id="rate">سعر الصرف: -</h4>
     <small id="update">آخر تحديث: -</small>
-
 </div>
 
 <script>
@@ -67,63 +64,50 @@ const rateEl   = document.getElementById("rate");
 const updateEl = document.getElementById("update");
 
 
-// --- 1) تحميل العملات ---
+// تحميل العملات من API يعمل فعلاً
 async function loadSymbols() {
-    try {
-        const res = await fetch("https://api.exchangerate.host/symbols");
-        const data = await res.json();
+    const res = await fetch("https://open.er-api.com/v6/latest/USD");
+    const data = await res.json();
 
-        const symbols = Object.keys(data.symbols);
+    const currencies = Object.keys(data.rates);
 
-        symbols.forEach(s => {
-            fromEl.innerHTML += `<option value="${s}">${s}</option>`;
-            toEl.innerHTML   += `<option value="${s}">${s}</option>`;
-        });
+    currencies.forEach(c => {
+        fromEl.innerHTML += `<option value="${c}">${c}</option>`;
+        toEl.innerHTML   += `<option value="${c}">${c}</option>`;
+    });
 
-        fromEl.value = "USD";
-        toEl.value   = "SAR";
-
-    } catch (e) { 
-        console.error("Error loading symbols", e); 
-    }
+    fromEl.value = "USD";
+    toEl.value = "SAR";
 }
 
 
-// --- 2) التحويل ---
+// التحويل
 async function doConvert() {
     const amount = Number(amountEl.value);
-    const from   = fromEl.value;
-    const to     = toEl.value;
+    const from = fromEl.value;
+    const to = toEl.value;
 
     if (!amount || amount <= 0) {
         resultEl.textContent = "أدخل مبلغًا صحيحًا";
         return;
     }
 
-    const url = `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
+    const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+    const data = await res.json();
 
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
+    const rate = data.rates[to];
+    const converted = amount * rate;
 
-        const rate = data.info.rate;
-        const converted = data.result;
-
-        resultEl.textContent = `النتيجة: ${converted} ${to}`;
-        rateEl.textContent   = `سعر الصرف: 1 ${from} = ${rate} ${to}`;
-        updateEl.textContent = new Date().toLocaleString();
-
-    } catch (e) {
-        resultEl.textContent = "خطأ في التحويل";
-        console.error("convert error", e);
-    }
+    resultEl.textContent = `النتيجة: ${converted.toFixed(2)} ${to}`;
+    rateEl.textContent   = `سعر الصرف: 1 ${from} = ${rate} ${to}`;
+    updateEl.textContent = data.time_last_update_utc;
 }
 
 
-// --- 3) تأكد من تحميل العملات أولًا ثم بدء العمل ---
-(async()=>{
-    await loadSymbols();   // ← أهم خطوة
-    doConvert();           // يبدأ فقط بعد تحميل العملات
+// تشغيل عند تحميل الصفحة
+(async () => {
+    await loadSymbols();
+    doConvert();
 })();
 </script>
 
